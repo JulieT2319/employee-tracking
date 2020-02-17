@@ -1,0 +1,24 @@
+{
+	"name": "employee-tracking",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/JulieT2319/employee-tracking.git"
+	},
+	"author": "Julie Theriault",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/JulieT2319/employee-tracking/issues"
+	},
+	"homepage": "https://github.com/JulieT2319/employee-tracking#readme",
+	"dependencies": {
+		"console.table": "^0.10.0",
+		"inquirer": "^7.0.4",
+		"mysql": "^2.18.1"
+	}
+}
