@@ -3,6 +3,10 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "app.js",
+	"directories": {
+		"lib": "lib",
+		"test": "test"
+	},
 	"scripts": {
 		"test": "jest --verbose test/*"
 	},
