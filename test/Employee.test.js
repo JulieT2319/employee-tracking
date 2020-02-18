@@ -24,7 +24,7 @@ test("Can set role via constructor argument", () => {
 });
 
 test("Can set manager via constructor argument", () => {
-	const testValue = "2";
+	const testValue = 2;
 	const e = new Employee("Alice", "James", 3, testValue);
 	expect(e.manager_id).toBe(testValue);
 });
