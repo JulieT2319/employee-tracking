@@ -1,6 +1,7 @@
 const inq = require("inquirer");
 const mysql = require("mysql");
 require("dotenv").config();
+const cTable = require('console.table');
 var connection = mysql.createConnection({
 	host: "localhost",
 
@@ -45,24 +46,28 @@ function view() {
 		choices: ["Departments", "Roles", "Employees"],
 		type: "list"
 	}).then(function (choice) {
-		query = "SELECT * FROM ?";
+		query = "SELECT * FROM ??";
 		if (choice.view === "Departments") {
-			connection.query("SELECT * FROM department", function (err, res) {
-				console.log(res);
-				for (var i = 0; i < res.length; i++) {
-					console.log(
-						"Department " +
-						res[i].id +
-						". " +
-						res[i].name
-					);
-				};
-			});
+			connection.query(query, ['department'], function (err, res) {
+				console.log("---Company Departments---");
+				console.table(res)
+				start();
+			})
+
 		} else if (choice.view === "Roles") {
-
+			connection.query(query, ['role'], function (err, res) {
+				console.log("---Company Roles---");
+				console.table(res)
+				start();
+			});
 		} else if (choice.view === "Employees") {
-
+			connection.query(query, ['employee'], function (err, res) {
+				console.log("---Company Employees---");
+				console.table(res)
+				start();
+			});
 		}
-		start();
+
 	});
 }
+
