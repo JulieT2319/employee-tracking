@@ -18,4 +18,22 @@ var connection = mysql.createConnection({
 // connect to the mysql server and sql database
 connection.connect(function (err) {
 	if (err) throw err;
+	start();
 });
+
+function start() {
+	inq.prompt({
+		name: "addOrShow",
+		message: "Do you want search the database or add to the database?",
+		choices: ["Search", "Add", "Neither"],
+		type: "list"
+	}).then(function (choice) {
+		if (choice.addOrShow === "Search") {
+
+		} else if (choice.addOrShow === "Add") {
+
+		} else {
+			connection.end();
+		}
+	});
+}
