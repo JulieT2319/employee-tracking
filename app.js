@@ -29,20 +29,21 @@ function start() {
 	inquirer.prompt({
 		name: "addOrShow",
 		message: "What do you want to do?",
-		choices: ["View table", "Add information", "Update employee", "None of these"],
+		choices: ["View table", "Add information", "Update employee title", "None of these"],
 		type: "list"
 	}).then(function (choice) {
 		if (choice.addOrShow === "View table") {
 			view();
 		} else if (choice.addOrShow === "Add information") {
 			add();
-		} else if (choice.addOrShow === "Update employee") {
+		} else if (choice.addOrShow === "Update employee title") {
 			update();
 		} else {
 			connection.end();
 		}
 	});
 }
+
 function view() {
 	inquirer.prompt({
 		name: "view",
@@ -195,6 +196,7 @@ function add() {
 								.prompt([
 									{
 										name: "manager",
+										message: "Who is this employee's manager?",
 										type: "rawlist",
 										choices: function () {
 											var choiceArray = [];
@@ -233,3 +235,62 @@ function add() {
 		}
 	});
 };
+
+function update() {
+	connection.query("SELECT * FROM employee", function (error, emp) {
+		if (error) throw error;
+		inquirer
+			.prompt([
+				{
+					name: "employee",
+					message: "What employee are you updating the role for?",
+					type: "rawlist",
+					choices: function () {
+						var choiceArray = [];
+						for (var i = 0; i < emp.length; i++) {
+							choiceArray.push(emp[i].first_name + " " + emp[i].last_name);
+						}
+						return choiceArray;
+					}
+				}
+			]).then(function (answer) {
+				// get the information of the chosen department
+				var chosenEmployee;
+				for (var i = 0; i < emp.length; i++) {
+					var empName = emp[i].first_name + " " + emp[i].last_name;
+					if (empName === answer.employee) {
+						chosenEmployee = emp[i];
+					}
+				}
+				connection.query("SELECT * FROM role", function (err, results) {
+					if (err) throw err;
+					inquirer.prompt({
+						name: "choice",
+						type: "rawlist",
+						choices: function () {
+							var choiceArray = [];
+							for (var i = 0; i < results.length; i++) {
+								choiceArray.push(results[i].title);
+							}
+							return choiceArray;
+						}
+					}).then(function (answer2) {
+						var chosenRole;
+						for (var i = 0; i < results.length; i++) {
+							if (results[i].title === answer2.choice) {
+								chosenRole = results[i];
+							}
+						}
+						connection.query(
+							"UPDATE employee SET role_id = ? WHERE id = ?",
+							[chosenRole.id, chosenEmployee.id],
+							function (err) {
+								if (err) throw err;
+								console.log("Your employee was updated successfully!");
+								start();
+							});
+					});
+				});
+			});
+	});
+}
