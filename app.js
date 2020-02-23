@@ -19,7 +19,6 @@ var connection = mysql.createConnection({
 // connect to the mysql server and sql database
 connection.connect(function(err) {
 	if (err) throw err;
-	console.log(process.env.SQL_PASSWORD + "\n" + process.env.SQL_DB);
 	start();
 });
 
@@ -133,6 +132,7 @@ function add() {
 								}
 							},
 							{
+								message: "What is this role's department?"
 								name: "choice",
 								type: "rawlist",
 								choices: function() {
