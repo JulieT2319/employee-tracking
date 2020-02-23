@@ -189,22 +189,47 @@ function add() {
 								chosenRole = results[i];
 							}
 						}
-						connection.query(
-							"INSERT INTO employee SET ?",
-							{
-								first_name: answer.fname,
-								last_name: answer.lname,
-								role_id: chosenRole.id
-							},
-							function (err) {
-								if (err) throw err;
-								console.log("Your employee was created successfully!");
-								start();
-							}
-						);
+						connection.query("SELECT * FROM employee", function (err, emp) {
+							if (err) throw err;
+							inquirer
+								.prompt([
+									{
+										name: "manager",
+										type: "rawlist",
+										choices: function () {
+											var choiceArray = [];
+											for (var i = 0; i < emp.length; i++) {
+												choiceArray.push(emp[i].first_name + " " + emp[i].last_name);
+											}
+											choiceArray.push("No manager");
+											return choiceArray;
+										}
+									}
+								]).then(function (answer2) {
+									// get the information of the chosen department
+									var chosenManager = { id: null };
+									for (var i = 0; i < emp.length; i++) {
+										var managerName = emp[i].first_name + " " + emp[i].last_name;
+										if (managerName === answer2.manager) {
+											chosenManager = emp[i];
+										}
+									} connection.query(
+										"INSERT INTO employee SET ?",
+										{
+											first_name: answer.fname,
+											last_name: answer.lname,
+											role_id: chosenRole.id,
+											manager_id: chosenManager.id
+										},
+										function (err) {
+											if (err) throw err;
+											console.log("Your employee was created successfully!");
+											start();
+										});
+								});
+						});
 					});
 			});
 		}
-
 	});
-}
+};
