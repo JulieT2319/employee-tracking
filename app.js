@@ -1,4 +1,4 @@
-const inq = require("inquirer");
+const inquirer = require("inquirer");
 const mysql = require("mysql");
 require("dotenv").config();
 
@@ -26,7 +26,7 @@ connection.connect(function (err) {
 });
 
 function start() {
-	inq.prompt({
+	inquirer.prompt({
 		name: "addOrShow",
 		message: "What do you want to do?",
 		choices: ["View table", "Add information", "Update employee", "None of these"],
@@ -44,7 +44,7 @@ function start() {
 	});
 }
 function view() {
-	inq.prompt({
+	inquirer.prompt({
 		name: "view",
 		message: "What do you want to view?",
 		choices: ["Departments", "Roles", "Employees"],
@@ -77,26 +77,84 @@ function view() {
 }
 
 function add() {
-	inq.prompt({
+	inquirer.prompt({
 		name: "add",
 		message: "What do you want to add?",
 		choices: ["Department", "Role", "Employee"],
 		type: "list"
 	}).then(function (choice) {
-		query = "SELECT * FROM ??";
 		if (choice.add === "Department") {
-			inq.prompt([{
+			inquirer.prompt([{
 				name: "dept",
 				message: "What is the new department?",
 				type: "input"
 			}]).then(function (data) {
-				connection.query("INSERT INTO ?? (??) VALUES (?);", ['department', 'name', data.dept]);
-				start();
+				connection.query("INSERT INTO ?? (??) VALUES (?);", ['department', 'name', data.dept], function (err) {
+					if (err) throw err;
+					console.log("Your department was created successfully!");
+					start();
+				});
 			});
 
-		} else if (choice.view === "Role") {
+		} else if (choice.add === "Role") {
+			connection.query("SELECT * FROM department", function (err, results) {
+				if (err) throw err;
+				inquirer
+					.prompt([
+						{
+							name: "title",
+							type: "input",
+							message: "What is the new role's title?"
+						},
+						{
+							name: "salary",
+							type: "input",
+							message: "How much is this role's salary?",
+							validate: function (value) {
+								if (isNaN(value)) {
+									return "Please enter a salary amount";
+								} else {
+									return true
+								}
+							}
+						},
+						{
+							name: "choice",
+							type: "rawlist",
+							choices: function () {
+								var choiceArray = [];
+								for (var i = 0; i < results.length; i++) {
+									choiceArray.push(results[i].name);
+								}
+								return choiceArray;
+							}
+						}
 
-		} else if (choice.view === "Employees") {
+					])
+					.then(function (answer) {
+						// get the information of the chosen department
+						var chosenDept;
+						for (var i = 0; i < results.length; i++) {
+							if (results[i].name === answer.choice) {
+								chosenDept = results[i];
+							}
+						}
+						connection.query(
+							"INSERT INTO role SET ?",
+							{
+								title: answer.title,
+								salary: answer.salary,
+								department_id: chosenDept.id
+							},
+							function (err) {
+								if (err) throw err;
+								console.log("Your role was created successfully!");
+								start();
+							}
+						);
+					});
+			});
+		} else if (choice.add === "Employees") {
 
 		}
 
