@@ -154,8 +154,56 @@ function add() {
 						);
 					});
 			});
-		} else if (choice.add === "Employees") {
-
+		} else if (choice.add === "Employee") {
+			connection.query("SELECT * FROM role", function (err, results) {
+				if (err) throw err;
+				inquirer
+					.prompt([
+						{
+							name: "fname",
+							type: "input",
+							message: "What is the new employee's first name?"
+						},
+						{
+							name: "lname",
+							type: "input",
+							message: "What is the new employee's last name?"
+						},
+						{
+							name: "title",
+							type: "rawlist",
+							choices: function () {
+								var choiceArray = [];
+								for (var i = 0; i < results.length; i++) {
+									choiceArray.push(results[i].title);
+								}
+								return choiceArray;
+							}
+						}
+					])
+					.then(function (answer) {
+						// get the information of the chosen title
+						var chosenRole;
+						for (var i = 0; i < results.length; i++) {
+							if (results[i].title === answer.title) {
+								chosenRole = results[i];
+							}
+						}
+						connection.query(
+							"INSERT INTO employee SET ?",
+							{
+								first_name: answer.fname,
+								last_name: answer.lname,
+								role_id: chosenRole.id
+							},
+							function (err) {
+								if (err) throw err;
+								console.log("Your employee was created successfully!");
+								start();
+							}
+						);
+					});
+			});
 		}
 
 	});
