@@ -132,7 +132,7 @@ function add() {
 								}
 							},
 							{
-								message: "What is this role's department?"
+								message: "What is this role's department?",
 								name: "choice",
 								type: "rawlist",
 								choices: function() {
